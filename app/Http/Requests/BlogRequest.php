@@ -24,7 +24,7 @@ class BlogRequest extends FormRequest
     public function rules()
     {
         return [
-            'url' => 'required',
+            'url' => 'required|File',
             'title' => 'required',
             'body' => 'required'
         ];

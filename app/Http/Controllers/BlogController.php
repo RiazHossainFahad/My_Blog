@@ -18,7 +18,7 @@ class BlogController extends Controller
      */
     public function index()
     {
-        return BlogResource::collection(Blog::paginate(5));
+        return BlogResource::collection(Blog::all());
     }
 
     /**
@@ -29,14 +29,29 @@ class BlogController extends Controller
      */
     public function store(BlogRequest $request)
     {
-        $blog = new Blog;
-        $blog->url = $request->url;
-        $blog->title = $request->title;
-        $blog->body = $request->body;
-        $blog->save();
-        return response([
-            'data' => new BlogResource($blog)
-        ], Response::HTTP_CREATED);
+        if($request->hasFile('url')){
+            $file = $request->file('url');
+            $fn = $file->getClientOriginalName();
+            $ext = $file->getClientOriginalExtension();
+
+            if($ext === 'jpg' || $ext === 'png' || $ext === 'jpeg'){
+                $file->move('F:\create-blog\src\assets', $fn);
+                $blog = new Blog;
+                $blog->url = $fn;
+                $blog->title = $request->title;
+                $blog->body = $request->body;
+                $blog->save();
+                return response([
+                    'data' => new BlogResource($blog)
+                ], Response::HTTP_CREATED);
+            }
+            else {
+                return response([
+                    'Error' => 'File Not supported'
+                ], 505);
+            }
+            return $ext;
+        }
     }
 
     /**
